@@ -3,6 +3,8 @@
 
 #include "clyycontrol.h"
 
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -19,7 +21,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pb_Close_clicked()
 {
-    m_pControl->closePower();
+    //m_pControl->closePower();
+    qDebug() << m_pControl->readTemperature(254);
 }
 
 void MainWindow::on_pb_Open_clicked()
