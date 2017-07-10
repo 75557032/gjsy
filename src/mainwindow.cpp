@@ -21,8 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pb_Close_clicked()
 {
-    //m_pControl->closePower();
-    qDebug() << m_pControl->readTemperature(254);
+    m_pControl->closePower();
 }
 
 void MainWindow::on_pb_Open_clicked()
@@ -42,4 +41,10 @@ void MainWindow::on_pb_Set_clicked()
         dCurrent = 1;
     }
     m_pControl->setPower(dVoltage, dCurrent);
+}
+
+void MainWindow::on_pb_Read_clicked()
+{
+    unsigned char nAddr = ui->lineEdit->text().trimmed().toUInt();
+    ui->lb_out->setText(QString::fromUtf8("%1").arg(m_pControl->readTemperature(nAddr)));
 }

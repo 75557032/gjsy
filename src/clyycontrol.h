@@ -4,7 +4,7 @@
 #include <QObject>
 
 class QSerialPort;
-class QModbusTcpClient;
+class QTcpSocket;
 
 class clyyControl : public QObject
 {
@@ -16,11 +16,11 @@ public:
     void setPower(double dVoltage, double dCurrent);
     void openPower();
     void closePower();
-    QVariant readTemperature(int nAddr);
+    double readTemperature(unsigned char nAddr);
 
 private:
     QSerialPort *m_pPowerControl;
-    QModbusTcpClient *m_pTemperatureControl;
+    QTcpSocket *m_pTemperatureControl;
 };
 
 #endif // CLYYCONTROL_H

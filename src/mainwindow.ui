@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>94</height>
+    <height>129</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,13 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="2">
+     <widget class="QPushButton" name="pb_Close">
+      <property name="text">
+       <string>关闭电源输出</string>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="4">
      <widget class="QPushButton" name="pb_Set">
       <property name="text">
@@ -29,24 +36,10 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="pb_Close">
-      <property name="text">
-       <string>关闭电源输出</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>电流</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>电压</string>
       </property>
      </widget>
     </item>
@@ -63,11 +56,46 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="1" colspan="4">
-     <widget class="QLineEdit" name="le_Current"/>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>电压</string>
+      </property>
+     </widget>
     </item>
     <item row="0" column="1" colspan="4">
      <widget class="QLineEdit" name="le_Voltage"/>
+    </item>
+    <item row="1" column="1" colspan="4">
+     <widget class="QLineEdit" name="le_Current"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>地址</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="4">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="text">
+       <string>1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QPushButton" name="pb_Read">
+      <property name="text">
+       <string>读取</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="4">
+     <widget class="QLabel" name="lb_out">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

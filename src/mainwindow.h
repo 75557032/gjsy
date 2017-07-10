@@ -24,6 +24,8 @@ private slots:
 
     void on_pb_Set_clicked();
 
+    void on_pb_Read_clicked();
+
 private:
     Ui::MainWindow *ui;
     clyyControl *m_pControl;
