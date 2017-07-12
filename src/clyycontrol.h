@@ -16,11 +16,18 @@ public:
     void setPower(double dVoltage, double dCurrent);
     void openPower();
     void closePower();
+    double readPower();
+    double readCurrent();
+    double readVoltage();
     double readTemperature(unsigned char nAddr);
 
 private:
     QSerialPort *m_pPowerControl;
     QTcpSocket *m_pTemperatureControl;
+
+protected:
+    QString readDataFromPowerControl(const QString &cmd);
+    void writeDataToPowerControl(const QString &cmd);
 };
 
 #endif // CLYYCONTROL_H

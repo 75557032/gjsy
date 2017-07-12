@@ -4,8 +4,11 @@
 #include <QTcpSocket>
 #include <QtEndian>
 #include <QUrl>
+#include <QThread>
 
 #include <QDebug>
+
+#define TESTCOUNT (3)
 
 static unsigned char auchCRCHi[] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
@@ -67,17 +70,18 @@ clyyControl::clyyControl(QObject *parent) : QObject(parent),
     m_pPowerControl(new QSerialPort),
     m_pTemperatureControl(new QTcpSocket)
 {
-    m_pPowerControl->setPortName("COM7");
-    m_pPowerControl->open(QIODevice::ReadWrite);
-    m_pPowerControl->setBaudRate(QSerialPort::Baud9600);
-    m_pPowerControl->setDataBits(QSerialPort::Data8);
-    m_pPowerControl->setParity(QSerialPort::NoParity);
-    m_pPowerControl->setStopBits(QSerialPort::OneStop);
-    m_pPowerControl->setFlowControl(QSerialPort::NoFlowControl);
+    m_pPowerControl->setPortName("COM3");
+    if (m_pPowerControl->open(QSerialPort::ReadWrite)) {
+        m_pPowerControl->setBaudRate(QSerialPort::Baud9600);
+        m_pPowerControl->setDataBits(QSerialPort::Data8);
+        m_pPowerControl->setParity(QSerialPort::NoParity);
+        m_pPowerControl->setStopBits(QSerialPort::OneStop);
+        writeDataToPowerControl(QString::fromUtf8("*CLS\n"));
+    }
 
     const QUrl url = QUrl::fromUserInput("192.168.1.232:10000");
     m_pTemperatureControl->connectToHost(url.host(), url.port());
-    m_pTemperatureControl->waitForConnected();
+    m_pTemperatureControl->waitForConnected(3000);
 }
 
 clyyControl::~clyyControl()
@@ -94,20 +98,32 @@ clyyControl::~clyyControl()
 
 void clyyControl::setPower(double dVoltage, double dCurrent)
 {
-    m_pPowerControl->write(QString::fromUtf8(":APPL %1,%2\n").arg(dVoltage).arg(dCurrent).toLocal8Bit());
-    m_pPowerControl->waitForBytesWritten(3000);
+    writeDataToPowerControl(QString::fromUtf8(":APPL %1,%2\n").arg(dVoltage).arg(dCurrent));
 }
 
 void clyyControl::openPower()
 {
-    m_pPowerControl->write(QString::fromUtf8(":OUTP ON\n").toLocal8Bit());
-    m_pPowerControl->waitForBytesWritten(3000);
+    writeDataToPowerControl(QString::fromUtf8(":OUTP ON\n"));
 }
 
 void clyyControl::closePower()
 {
-    m_pPowerControl->write(QString::fromUtf8(":OUTP OFF\n").toLocal8Bit());
-    m_pPowerControl->waitForBytesWritten(3000);
+    writeDataToPowerControl(QString::fromUtf8(":OUTP OFF\n"));
+}
+
+double clyyControl::readPower()
+{
+    return readDataFromPowerControl(QString::fromUtf8("MEAS:POW?\n")).toDouble();
+}
+
+double clyyControl::readCurrent()
+{
+    return readDataFromPowerControl(QString::fromUtf8(":MEAS:CURR?\n")).toDouble();
+}
+
+double clyyControl::readVoltage()
+{
+    return readDataFromPowerControl(QString::fromUtf8(":MEAS?\n")).toDouble();
 }
 
 double clyyControl::readTemperature(unsigned char nAddr)
@@ -121,5 +137,31 @@ double clyyControl::readTemperature(unsigned char nAddr)
     }
     QByteArray read = m_pTemperatureControl->readAll();
     qint16 temp = qFromBigEndian<qint16>(&read.constData()[3]);
-    return (double)temp / (double)100;
+    return (double)temp * 0.01;
+}
+
+QString clyyControl::readDataFromPowerControl(const QString &cmd)
+{
+    m_pPowerControl->write(cmd.toLocal8Bit());
+    if (!m_pPowerControl->waitForReadyRead(3000)) {
+        return QString();
+    }
+    QByteArray data = m_pPowerControl->readAll();
+    while (m_pPowerControl->waitForReadyRead(20)) {
+        data += m_pPowerControl->readAll();
+    }
+    QList<QByteArray> list = data.split('\n');
+    list.removeAll("");
+    if (0 == list.size()) {
+        return QString();
+    }
+    QString ret = list.last().trimmed();
+    return ret;
+}
+
+void clyyControl::writeDataToPowerControl(const QString &cmd)
+{
+    m_pPowerControl->write(cmd.toLocal8Bit());
+    m_pPowerControl->waitForBytesWritten(3000);
+    m_pPowerControl->readAll();
 }

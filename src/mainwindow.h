@@ -26,9 +26,20 @@ private slots:
 
     void on_pb_Read_clicked();
 
+    void on_pb_ReadVol_clicked();
+
+    void on_pb_ReadCurrent_clicked();
+
+    void on_pb_ReadPower_clicked();
+
+    void on_pb_Test_clicked();
+
 private:
     Ui::MainWindow *ui;
     clyyControl *m_pControl;
+
+private:
+    void saveResultToFile(const QString &path, const QStringList &line);
 };
 
 #endif // MAINWINDOW_H

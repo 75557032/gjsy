@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    clyycontrol.cpp
+    clyycontrol.cpp \
+    clyypid.cpp
 
 HEADERS += \
         mainwindow.h \
-    clyycontrol.h
+    clyycontrol.h \
+    clyypid.h
 
 FORMS += \
         mainwindow.ui
