@@ -66,11 +66,12 @@ void CRC16(unsigned char *puchMsg, unsigned short usDataLen, unsigned char *out)
     out[1] = uchCRCHi;
 }
 
-clyyControl::clyyControl(QObject *parent) : QObject(parent),
+clyyControl::clyyControl(const QString &portName, const QString &addr, QObject *parent) :
+    QObject(parent),
     m_pPowerControl(new QSerialPort),
     m_pTemperatureControl(new QTcpSocket)
 {
-    m_pPowerControl->setPortName("COM3");
+    m_pPowerControl->setPortName(portName);
     if (m_pPowerControl->open(QSerialPort::ReadWrite)) {
         m_pPowerControl->setBaudRate(QSerialPort::Baud9600);
         m_pPowerControl->setDataBits(QSerialPort::Data8);
@@ -79,7 +80,7 @@ clyyControl::clyyControl(QObject *parent) : QObject(parent),
         writeDataToPowerControl(QString::fromUtf8("*CLS\n"));
     }
 
-    const QUrl url = QUrl::fromUserInput("192.168.1.232:10000");
+    const QUrl url = QUrl::fromUserInput(addr);
     m_pTemperatureControl->connectToHost(url.host(), url.port());
     m_pTemperatureControl->waitForConnected(3000);
 }
@@ -136,6 +137,9 @@ double clyyControl::readTemperature(unsigned char nAddr)
         return 0;
     }
     QByteArray read = m_pTemperatureControl->readAll();
+    while (m_pTemperatureControl->waitForReadyRead(20)) {
+        read += m_pTemperatureControl->readAll();
+    }
     qint16 temp = qFromBigEndian<qint16>(&read.constData()[3]);
     return (double)temp * 0.01;
 }

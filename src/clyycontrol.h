@@ -11,7 +11,7 @@ class clyyControl : public QObject
     Q_OBJECT
 
 public:
-    explicit clyyControl(QObject *parent = nullptr);
+    explicit clyyControl(const QString &portName, const QString &addr, QObject *parent = nullptr);
     ~clyyControl();
     void setPower(double dVoltage, double dCurrent);
     void openPower();

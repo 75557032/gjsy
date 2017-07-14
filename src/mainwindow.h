@@ -37,9 +37,16 @@ private slots:
 private:
     Ui::MainWindow *ui;
     clyyControl *m_pControl;
+    int m_nTimerId;
 
 private:
-    void saveResultToFile(const QString &path, const QStringList &line);
+    void saveResultToFile(const QString &path, const QList<double> &line);
+    void changeTemperature(double speed, double Aspeed);
+    double getResistance(double speed);
+    void compareTemperature(unsigned char nFrom, unsigned char nTo);
+
+protected:
+    void timerEvent(QTimerEvent *e);
 };
 
 #endif // MAINWINDOW_H
