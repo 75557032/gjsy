@@ -141,6 +141,7 @@ double clyyControl::readTemperature(unsigned char nAddr)
         read += m_pTemperatureControl->readAll();
     }
     qint16 temp = qFromBigEndian<qint16>(&read.constData()[3]);
+    QThread::msleep(500);
     return (double)temp * 0.01;
 }
 
@@ -160,6 +161,7 @@ QString clyyControl::readDataFromPowerControl(const QString &cmd)
         return QString();
     }
     QString ret = list.last().trimmed();
+    QThread::msleep(500);
     return ret;
 }
 
@@ -168,4 +170,5 @@ void clyyControl::writeDataToPowerControl(const QString &cmd)
     m_pPowerControl->write(cmd.toLocal8Bit());
     m_pPowerControl->waitForBytesWritten(3000);
     m_pPowerControl->readAll();
+    QThread::msleep(500);
 }

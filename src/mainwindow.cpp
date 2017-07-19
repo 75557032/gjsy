@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QThread>
 
 #include "clyycontrol.h"
 #include "clyypid.h"
@@ -113,6 +114,41 @@ void MainWindow::compareTemperature(unsigned char nFrom, unsigned char nTo)
     saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, speed, Aspeed});
 }
 
+#define CALCSIZE                    (5)
+#define TEMPERATURE                 (0.1)
+#define SETVOLWAITTIME              (1000 * 60)
+#define READTEMPERTURETIME          (1000 * 20)
+
+bool MainWindow::isStable(double *tempera)
+{
+    double sum = 0;
+    for (int i = 0; i < CALCSIZE - 1; ++i) {
+        sum += abs(tempera[i] - tempera[i + 1]);
+    }
+    return (TEMPERATURE >= (sum / (double)CALCSIZE));
+}
+
+void MainWindow::calc(double vol)
+{
+    m_pControl->setPower(vol, 1);
+    QThread::msleep(SETVOLWAITTIME);
+    QVector<double> list;
+    while (true) {
+        double speed = m_pControl->readTemperature(1);
+        list.append(speed);
+        if (list.size() >= CALCSIZE) {
+            if (isStable(&list[list.size() - CALCSIZE])) {
+                double dPower = m_pControl->readPower();
+                double dCurrent = m_pControl->readCurrent();
+                double dVoltage = m_pControl->readVoltage();
+                saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, speed});
+                return;
+            }
+        }
+        QThread::msleep(READTEMPERTURETIME);
+    }
+}
+
 void MainWindow::timerEvent(QTimerEvent *e)
 {
     Q_UNUSED(e);
@@ -130,4 +166,16 @@ void MainWindow::on_pb_Test_clicked()
         m_nTimerId = ERRTIMERID;
         ui->pb_Test->setText("测试");
     }
+}
+
+void MainWindow::on_pb_Calc_clicked()
+{
+    qDebug() << "Test Begin!";
+    m_pControl->openPower();
+    QList<double> list = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
+    for (int i = 0; i < list.size(); ++i) {
+        calc(list.at(i));
+    }
+    m_pControl->closePower();
+    qDebug() << "Test OK!";
 }

@@ -34,6 +34,8 @@ private slots:
 
     void on_pb_Test_clicked();
 
+    void on_pb_Calc_clicked();
+
 private:
     Ui::MainWindow *ui;
     clyyControl *m_pControl;
@@ -44,6 +46,8 @@ private:
     void changeTemperature(double speed, double Aspeed);
     double getResistance(double speed);
     void compareTemperature(unsigned char nFrom, unsigned char nTo);
+    bool isStable(double *tempera);
+    void calc(double vol);
 
 protected:
     void timerEvent(QTimerEvent *e);
