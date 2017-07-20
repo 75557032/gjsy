@@ -88,30 +88,25 @@ void MainWindow::saveResultToFile(const QString &path, const QList<double> &line
     out << strLine << "\n";
 }
 
-void MainWindow::changeTemperature(double speed, double Aspeed)
+void MainWindow::changeTemperature(double targetT, double currentT)
 {
-    double power = PID_realize(speed, Aspeed);
-    double dResistance = getResistance(speed);
+    double power = PID_realize(targetT, currentT);
+    double dResistance = PID_resistance(power, currentT);
     double dVol = power / dResistance;
     m_pControl->setPower(dVol, 2);
 }
 
-double MainWindow::getResistance(double speed)
+void MainWindow::compareTemperature(unsigned char target, unsigned char current)
 {
-    return speed;
-}
-
-void MainWindow::compareTemperature(unsigned char nFrom, unsigned char nTo)
-{
-    double speed = m_pControl->readTemperature(nFrom);
-    double Aspeed = m_pControl->readTemperature(nTo);
-    if (speed != Aspeed) {
-        changeTemperature(speed, Aspeed);
+    double targetT = m_pControl->readTemperature(target);
+    double currentT = m_pControl->readTemperature(current);
+    if (targetT != currentT) {
+        changeTemperature(targetT, currentT);
     }
     double dPower = m_pControl->readPower();
     double dCurrent = m_pControl->readCurrent();
     double dVoltage = m_pControl->readVoltage();
-    saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, speed, Aspeed});
+    saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, targetT, currentT});
 }
 
 #define CALCSIZE                    (5)

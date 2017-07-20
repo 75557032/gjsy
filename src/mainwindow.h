@@ -43,9 +43,8 @@ private:
 
 private:
     void saveResultToFile(const QString &path, const QList<double> &line);
-    void changeTemperature(double speed, double Aspeed);
-    double getResistance(double speed);
-    void compareTemperature(unsigned char nFrom, unsigned char nTo);
+    void changeTemperature(double targetT, double currentT);
+    void compareTemperature(unsigned char target, unsigned char current);
     bool isStable(double *tempera);
     void calc(double vol);
 
