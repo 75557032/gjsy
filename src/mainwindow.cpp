@@ -100,9 +100,7 @@ void MainWindow::compareTemperature(unsigned char target, unsigned char current)
 {
     double targetT = m_pControl->readTemperature(target);
     double currentT = m_pControl->readTemperature(current);
-    if (targetT != currentT) {
-        changeTemperature(targetT, currentT);
-    }
+    changeTemperature(targetT, currentT);
     double dPower = m_pControl->readPower();
     double dCurrent = m_pControl->readCurrent();
     double dVoltage = m_pControl->readVoltage();
@@ -153,8 +151,8 @@ void MainWindow::timerEvent(QTimerEvent *e)
 void MainWindow::on_pb_Test_clicked()
 {
     if (ERRTIMERID == m_nTimerId) {
-        m_nTimerId = startTimer(100);
         PID_init();
+        m_nTimerId = startTimer(100);
         ui->pb_Test->setText("停止");
     } else {
         killTimer(m_nTimerId);
@@ -166,6 +164,7 @@ void MainWindow::on_pb_Test_clicked()
 void MainWindow::on_pb_Calc_clicked()
 {
     qDebug() << "Test Begin!";
+    m_pControl->setPower(0, 1);
     m_pControl->openPower();
     QList<double> list = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
     for (int i = 0; i < list.size(); ++i) {

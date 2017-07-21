@@ -78,6 +78,7 @@ clyyControl::clyyControl(const QString &portName, const QString &addr, QObject *
         m_pPowerControl->setParity(QSerialPort::NoParity);
         m_pPowerControl->setStopBits(QSerialPort::OneStop);
         writeDataToPowerControl(QString::fromUtf8("*CLS\n"));
+        closePower();
     }
 
     const QUrl url = QUrl::fromUserInput(addr);
