@@ -91,8 +91,7 @@ void MainWindow::saveResultToFile(const QString &path, const QList<double> &line
 void MainWindow::changeTemperature(double targetT, double currentT)
 {
     double power = PID_realize(targetT, currentT);
-    double dResistance = PID_resistance(power, currentT);
-    double dVol = power / dResistance;
+    double dVol = PID_resistance(power, currentT);
     m_pControl->setPower(dVol, 2);
 }
 
