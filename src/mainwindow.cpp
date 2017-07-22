@@ -4,11 +4,19 @@
 #include <QDebug>
 #include <QFile>
 #include <QThread>
+#include <QDateTime>
+#include <QMessageBox>
 
 #include "clyycontrol.h"
 #include "clyypid.h"
 
-#define ERRTIMERID (-1)
+#define CALCSIZE                    (5)
+#define TEMPERATURE                 (0.1)
+#define SETVOLWAITTIME              (1000 * 60)
+#define READTEMPERTURETIME          (1000 * 20)
+#define ERRTIMERID                  (-1)
+#define CALCSAVEPATH                ("D:\\xx.txt")
+#define RESULTSAVEPATH              ("D:\\xx.txt")
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -74,7 +82,7 @@ void MainWindow::on_pb_ReadPower_clicked()
     ui->lb_Power->setText(QString::fromUtf8("%1").arg(m_pControl->readPower()));
 }
 
-void MainWindow::saveResultToFile(const QString &path, const QList<double> &line)
+void MainWindow::saveResultToFile(const QString &path, const QList<QVariant> &line)
 {
     QFile file(path);
     if (!file.open(QFile::WriteOnly | QFile::Text | QFile::Append)) {
@@ -83,7 +91,7 @@ void MainWindow::saveResultToFile(const QString &path, const QList<double> &line
     QTextStream out(&file);
     QString strLine;
     for (int i = 0; i < line.size(); ++i) {
-        strLine += QString("%1 ").arg(line.at(i));
+        strLine += line.at(i).toString() + QString(" ");
     }
     out << strLine << "\n";
 }
@@ -103,13 +111,9 @@ void MainWindow::compareTemperature(unsigned char target, unsigned char current)
     double dPower = m_pControl->readPower();
     double dCurrent = m_pControl->readCurrent();
     double dVoltage = m_pControl->readVoltage();
-    saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, targetT, currentT});
+    saveResultToFile(RESULTSAVEPATH, {QDateTime::currentDateTime().toTime_t(), dPower, dVoltage,
+                                      dCurrent, targetT, currentT});
 }
-
-#define CALCSIZE                    (5)
-#define TEMPERATURE                 (0.1)
-#define SETVOLWAITTIME              (1000 * 60)
-#define READTEMPERTURETIME          (1000 * 20)
 
 bool MainWindow::isStable(double *tempera)
 {
@@ -133,7 +137,8 @@ void MainWindow::calc(double vol)
                 double dPower = m_pControl->readPower();
                 double dCurrent = m_pControl->readCurrent();
                 double dVoltage = m_pControl->readVoltage();
-                saveResultToFile("D:\\xx.txt", {dPower, dVoltage, dCurrent, speed});
+                saveResultToFile(CALCSAVEPATH, {QDateTime::currentDateTime().toTime_t(), dPower,
+                                                dVoltage, dCurrent, speed});
                 return;
             }
         }
@@ -151,7 +156,7 @@ void MainWindow::on_pb_Test_clicked()
 {
     if (ERRTIMERID == m_nTimerId) {
         PID_init();
-        m_nTimerId = startTimer(100);
+        m_nTimerId = startTimer(1000);
         ui->pb_Test->setText("停止");
     } else {
         killTimer(m_nTimerId);
@@ -171,4 +176,5 @@ void MainWindow::on_pb_Calc_clicked()
     }
     m_pControl->closePower();
     qDebug() << "Test OK!";
+    QMessageBox::about(this, QString("提示"), QString("数据标教结束"));
 }

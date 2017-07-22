@@ -42,7 +42,7 @@ private:
     int m_nTimerId;
 
 private:
-    void saveResultToFile(const QString &path, const QList<double> &line);
+    void saveResultToFile(const QString &path, const QList<QVariant> &line);
     void changeTemperature(double targetT, double currentT);
     void compareTemperature(unsigned char target, unsigned char current);
     bool isStable(double *tempera);
